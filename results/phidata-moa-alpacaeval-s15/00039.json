@@ -1,0 +1,1 @@
+{"query": "instruction: Should I get my children a nanny? I'm so exhausted.", "answer": null, "result": null, "tools": {}, "retrieve_time": [], "rerank_time": [], "communication_size": {}, "communication_pack": {}, "total_time": [], "llm_time": {}, "llm_tokens": {}, "failure_run": true}

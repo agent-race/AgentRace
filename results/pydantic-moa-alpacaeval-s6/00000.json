@@ -1,0 +1,115 @@
+{
+    "query": "instruction: What are the names of some famous actors that started their careers on Broadway?",
+    "answer": "Some famous actors that started their careers on Broadway include: \n1. Hugh Jackman \n2. Meryl Streep \n3. Denzel Washington \n4. Julia Roberts \n5. Christopher Walken \n6. Anthony Rapp \n7. Audra McDonald \n8. Nathan Lane \n9. Sarah Jessica Parker \n10. Lin-Manuel Miranda",
+    "result": "Here are some famous actors who began their careers on Broadway before achieving success in film and television:\n\n1. **Meryl Streep** - Meryl Streep began her theatrical career on Broadway in the 1970s before becoming one of the most acclaimed actresses in Hollywood.\n\n2. **Al Pacino** - Before becoming a household name in the film industry, Al Pacino was a regular on Broadway, starring in productions like \"The Basic Training of Pavlo Hummel\".\n\n3. **Denzel Washington** - Washington made his Broadway debut in \"Fences\" and went on to win both Academy Awards and Tony Awards for his performances.\n\n4. **Katharine Hepburn** - Although known for her film career, Hepburn gained initial success on Broadway, performing in various plays in the 1920s and 1930s.\n\n5. **Hugh Jackman** - Known for his role as Wolverine, Hugh Jackman began his career in musical theater on Broadway, starring in productions like \"Oklahoma!\" and \"The Boy from Oz\".\n\n6. **Neil Patrick Harris** - Neil Patrick Harris started his career on Broadway with roles in productions like \"Rent\" and \"Hedwig and the Angry Inch\".\n\n7. **Idina Menzel** - Idina Menzel, famous for her role in Disney's \"Frozen\", began her career on Broadway in shows like \"Rent\" and \"Wicked\".\n\n8. **Kristin Chenoweth** - Chenoweth rose to fame on Broadway with roles in productions such as \"You're a Good Man, Charlie Brown\" and \"Wicked\".\n\n9. **Audra McDonald** - McDonald is a renowned Broadway performer who has won multiple Tony Awards for her roles in various theatrical productions.\n\n10. **Nathan Lane** - Lane's prominent Broadway career includes roles in \"The Producers\" and \"Angels in America\", later transitioning successfully into films.\n\n11. **Matthew Broderick** - Broderick began his career on Broadway with roles in productions like \"Brighton Beach Memoirs\" before becoming a film star with movies like \"Ferris Bueller's Day Off\".\n\n12. **Sutton Foster** - Foster starred in Broadway shows such as \"Thoroughly Modern Millie\" and \"Anything Goes\", ultimately gaining popularity in both theater and television.\n\n13. **Alan Cumming** - Cumming earned acclaim on Broadway with performances in shows like \"Cabaret\", also known for his film and TV roles.\n\nThese actors, along with many others, initially established their careers on Broadway before achieving greater fame in the film and television industries. Broadway has been a crucial starting point for numerous actors who later expanded their careers into other entertainment fields.",
+    "tools": {},
+    "retrieve_time": [],
+    "rerank_time": [],
+    "communication_size": {
+        "Root Agent_to_Agent 1": 60,
+        "Root Agent_to_Agent 2": 71,
+        "Root Agent_to_Agent 3": 59,
+        "Root Agent_to_Agent 4": 48,
+        "Root Agent_to_Agent 5": 83,
+        "Root Agent_to_Agent 6": 70,
+        "Agent 2_to_Root Agent": 1574,
+        "Agent 5_to_Root Agent": 1984,
+        "Agent 4_to_Root Agent": 2112,
+        "Agent 1_to_Root Agent": 2288,
+        "Agent 3_to_Root Agent": 1996,
+        "Agent 6_to_Root Agent": 2167
+    },
+    "communication_pack": {
+        "Root Agent_to_Agent 1": 0,
+        "Root Agent_to_Agent 2": 0,
+        "Root Agent_to_Agent 3": 0,
+        "Root Agent_to_Agent 4": 0,
+        "Root Agent_to_Agent 5": 0,
+        "Root Agent_to_Agent 6": 0,
+        "Agent 2_to_Root Agent": 0,
+        "Agent 5_to_Root Agent": 0,
+        "Agent 4_to_Root Agent": 0,
+        "Agent 1_to_Root Agent": 0,
+        "Agent 3_to_Root Agent": 0,
+        "Agent 6_to_Root Agent": 0
+    },
+    "total_time": [
+        33.70187306404114
+    ],
+    "llm_time": {
+        "gpt-4o-2024-08-06": [
+            8.865478038787842,
+            9.943368911743164
+        ],
+        "Qwen/Qwen2.5-7B-Instruct-Turbo": [
+            3.5391690731048584,
+            4.073572874069214
+        ],
+        "meta-llama/Llama-3.3-70B-Instruct-Turbo": [
+            4.247101783752441,
+            4.415464878082275
+        ],
+        "deepseek-ai/DeepSeek-V3": [
+            13.969829082489014,
+            14.811037063598633
+        ]
+    },
+    "llm_tokens": {
+        "gpt-4o-2024-08-06": {
+            "prompt": [
+                184,
+                3682
+            ],
+            "completion": [
+                182,
+                548
+            ],
+            "total": [
+                366,
+                4230
+            ]
+        },
+        "Qwen/Qwen2.5-7B-Instruct-Turbo": {
+            "prompt": [
+                36,
+                36
+            ],
+            "completion": [
+                393,
+                502
+            ],
+            "total": [
+                429,
+                538
+            ]
+        },
+        "meta-llama/Llama-3.3-70B-Instruct-Turbo": {
+            "prompt": [
+                54,
+                56
+            ],
+            "completion": [
+                492,
+                527
+            ],
+            "total": [
+                546,
+                583
+            ]
+        },
+        "deepseek-ai/DeepSeek-V3": {
+            "prompt": [
+                25,
+                25
+            ],
+            "completion": [
+                585,
+                595
+            ],
+            "total": [
+                610,
+                620
+            ]
+        }
+    }
+}
