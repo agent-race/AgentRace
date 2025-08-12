@@ -73,6 +73,29 @@ def react_gaia(checkpoint=None):
                 react_agent = load_llamaIndexagent('deepseek-chat', 'ReAct')
 
     
+def react_vqa(checkpoint=None):
+    weave.init('llamaindex-react-vqa', settings={"client_parallelism": 100})
+    change_log_file("results/llamaindex/log/llamaindex_vqa.log")
+    react_agent = load_llamaIndexagent('gpt-4o', 'ReAct')
+    from data.vqa import load_vqa
+    datas = load_vqa()
+    i=0
+    for data in datas:
+        if i%5!=0 or i<4875:
+            i+=1
+            continue
+        if i> 5000:
+            break
+        i+=1
+        id = data['question_id']
+        question = data['question']
+        answer = data['answers']
+        query = f"You need to naswer the question from the image.The path is:/root/AgentBench/data/VQA/image/{id}.png\nQuestion is: {question}\nAnswer the quetions just use easy words.Answer normalization (all chars lowercase, no period except as decimal point, number words —> digits, strip articles (a, an the)) "
+        logging.info(f"omni_run start, query: {query}")
+        result = react_agent.omni_run(query)
+        logging.info(f"omni_run end, result: {result}")
+        logging.info(f"omni_run end, answer:{answer}")
+        time.sleep(1)
 
 
 def react_human_eval(checkpoint=None):

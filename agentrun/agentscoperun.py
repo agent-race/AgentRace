@@ -325,6 +325,53 @@ def react_humaneval_test(repeat):
         print(taskid)
 
 
+def vqa_test():
+    logging.basicConfig(
+        filename=os.path.join(parent_dir,"results","agentscope","log","agentscope_vqa.log"), 
+        filemode='a',
+        level=logging.INFO, 
+        format='%(asctime)s,%(msecs)03d - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    
+    
+    weave.init(project_name="vqa_test")
+    from data.vqa import load_vqa
+    datas = load_vqa()
+    i=0
+    for data in datas:
+        if i%5!=0 or i<3750:
+            i+=1
+            continue
+        if i>5000:
+            break
+        i+=1
+        id = data['question_id']
+        question = data['question']
+        answer = data['answers']
+        query = f"You need to naswer the question from the image.The path is:/root/AgentBench/data/VQA/image/{id}.png\nQuestion is: {question}\nAnswer the quetions just use easy words.Answer normalization (all chars lowercase, no period except as decimal point, number words —> digits, strip articles (a, an the)) "
+        max_retries = 5
+        retry_count = 0
 
-    
-    
+        while retry_count < max_retries:
+            try:
+                agent=AgentScopeAgent(
+                    agent_type="ReAct",
+                    api_key=openai_api_key,
+                )
+                logging.info(f"omni_run start, query: {query}")
+                res=AgentScopeAgentRun(
+                    agent=agent,
+                    agent_type="ReAct",
+                    query=query
+                )
+                logging.info(f"omni_run end, result: {res}")
+                logging.info(f"omni_run end, answer:{answer}")
+                break
+            except Exception as e:
+                retry_count += 1
+                print(f"Retry #{retry_count} failed:{e}")
+                time.sleep(2)
+        else:
+            print("Multiple retries failed. Please check the issue. The task number with the error is ",i)
+            exit(0)

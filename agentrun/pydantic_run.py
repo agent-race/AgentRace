@@ -1,6 +1,8 @@
 import sys
 import os
-sys.path.append(os.getcwd())
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
+# sys.path.append(os.getcwd())
 from eval.token_count import init_token_count
 init_token_count(offline_mode=True)
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -8,13 +10,13 @@ import os
 import dotenv
 dotenv.load_dotenv(os.path.join(parent_dir,".env"))
 import logging
-logging.basicConfig(
-        filename='results/pydantic-initial-logs.log', 
-        filemode='a',
-        level=logging.INFO, 
-        format='%(asctime)s,%(msecs)03d - %(name)s - %(levelname)s - %(message)s', 
-        datefmt='%Y-%m-%d %H:%M:%S'
-    )
+# logging.basicConfig(
+#         filename='results/pydantic-initial-logs.log', 
+#         filemode='a',
+#         level=logging.INFO, 
+#         format='%(asctime)s,%(msecs)03d - %(name)s - %(levelname)s - %(message)s', 
+#         datefmt='%Y-%m-%d %H:%M:%S'
+#     )
 from eval.utils import change_log_file
 
 
@@ -219,29 +221,77 @@ def moa_alpacaeval(checkpoint=None):
                 time.sleep(5)
                 moa_agent = PydanticAgent('gpt-4o', 'MoA')
         
-    
-
-
-
-if __name__ == '__main__':
-    react_human_eval()
-    import argparse
-    parser = argparse.ArgumentParser(
-        description='pydantic-runner',
-        epilog='react_gaia, react_humaneval, rag_mmlu, moa_alpacaeval'
+def vqa_test():
+    client=weave.init('phidatai-vqa')
+    import os
+    filename=os.path.join(parent_dir,"results","phdantic","log","vqa-v3.log")
+    # 创建目录（如果不存在）
+    dir_path = os.path.dirname(filename)
+    os.makedirs(dir_path, exist_ok=True)
+    # 创建文件（如果不存在）
+    if not os.path.exists(filename):
+        with open(filename, 'w'):
+            pass
+    if not os.access(os.path.dirname(filename), os.W_OK):
+        raise PermissionError(f"Cannot write to directory: {os.path.dirname(filename)}")
+    logging.basicConfig(
+        filename=filename,  
+        filemode='a',
+        level=logging.INFO, 
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
+        datefmt='%Y-%m-%d %H:%M:%S',
+        force=True
     )
-    parser.add_argument('--react_gaia', action='store_true', help='run react on gaia')
-    parser.add_argument('--react_humaneval', action='store_true', help='run react on humaneval')
-    parser.add_argument('--rag_mmlu', action='store_true', help='run rag on mmlu')
-    parser.add_argument('--moa_alpacaeval', action='store_true', help='run moa on alpacaeval')
-    parser.add_argument("-checkpoint", help="checkpoint dir", type=str)
-    args = parser.parse_args()
-    if args.react_gaia:
-        react_gaia(args.checkpoint)
-    if args.react_humaneval:
-        react_human_eval(args.checkpoint)
-    if args.rag_mmlu:
-        rag_mmlu(args.checkpoint)
-    if args.moa_alpacaeval:
-        moa_alpacaeval(args.checkpoint)
+    from datasets import load_dataset
+    dataset = load_dataset(
+        "lmms-lab/OK-VQA"
+    )
+    datas=dataset['val2014']
+    react_agent = PydanticAgent('gpt-4o', 'ReAct')
+    i=0
+    print(datas)
+    for data in datas:
+            if i%5!=0:
+                i+=1
+                continue
+            question=data['question']
+            question_id=data['question_id']
+            answers=data['answers']
+            query = f"You need to naswer the question from the image.The path is:../data//VQA/image/{question_id}.png\nQuestion is: {question}\nAnswer the quetions just use easy words.Answer normalization (all chars lowercase, no period except as decimal point, number words —> digits, strip articles (a, an the)).You just need to use the vision tool for one time.What's more , you need to try your best yo understand the output of your tool.You need to Carefully analyze what the outcome of the problem is, as the tool output may not be very accurate. So if you can, you can make the output of your tool more detailed. If the output is too simple, you can tell me I don't know. If the tool is wrong, you can tell me the tool error. "
+            logging.info(f"omni_run start, query: {query}")
+            result = react_agent.omni_run(query)
+            logging.info(f"omni_run end, result: {result}")
+            logging.info(f"omni_run end, answer: {answers}")
+            client.flush()
+            logging.info(f"Now,we run the {i} over")
+            print(f"Now,we run the {i} over")
+            i+=1
+            if i%100==0:
+                time.sleep(10)
+    
+# vqa_test()    
+
+
+
+# if __name__ == '__main__':
+#     react_human_eval()
+#     import argparse
+#     parser = argparse.ArgumentParser(
+#         description='pydantic-runner',
+#         epilog='react_gaia, react_humaneval, rag_mmlu, moa_alpacaeval'
+#     )
+#     parser.add_argument('--react_gaia', action='store_true', help='run react on gaia')
+#     parser.add_argument('--react_humaneval', action='store_true', help='run react on humaneval')
+#     parser.add_argument('--rag_mmlu', action='store_true', help='run rag on mmlu')
+#     parser.add_argument('--moa_alpacaeval', action='store_true', help='run moa on alpacaeval')
+#     parser.add_argument("-checkpoint", help="checkpoint dir", type=str)
+#     args = parser.parse_args()
+#     if args.react_gaia:
+#         react_gaia(args.checkpoint)
+#     if args.react_humaneval:
+#         react_human_eval(args.checkpoint)
+#     if args.rag_mmlu:
+#         rag_mmlu(args.checkpoint)
+#     if args.moa_alpacaeval:
+#         moa_alpacaeval(args.checkpoint)
 

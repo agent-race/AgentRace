@@ -109,3 +109,31 @@ def mmlu_RAG():
             print("The task number whith the error is:", i)
             agent=autogen_agent("OpenAI","RAG")
         time.sleep(1)
+
+async def react_vqa():
+    change_log_file(os.path.join(parent_dir,"results","autogen","log","autogen_vqa.log"))
+    from data.vqa import load_vqa
+    datas = load_vqa()
+    i=0
+    for data in datas:
+        if i%5!=0:
+            i+=1
+            continue
+        if i>5000:
+            break
+        i+=1
+        agent = autogen_agent(model_name="gpt-4o",agent_type="ReAct")
+        id = data['question_id']
+        question = data['question']
+        answer = data['answers']
+        query = f"You need to naswer the question from the image.The path is:/root/AgentBench/data/VQA/image/{id}.png\nQuestion is: {question}\nAnswer the quetions just use easy words.Answer normalization (all chars lowercase, no period except as decimal point, number words —> digits, strip articles (a, an the)) "
+        logging.info(f"omni_run start, query: {query}")
+        try:
+            res = await agent.omni_run(input_text=query)
+            text_messages = res.messages[len(res.messages)-1].content
+        except Exception as e:
+            text_messages = e
+            print("An error occurred:", e)
+        logging.info(f"omni_run end, result: {text_messages}")
+        logging.info(f"omni_run end, answer:{answer}")
+        time.sleep(1)
