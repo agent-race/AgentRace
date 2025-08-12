@@ -4,7 +4,16 @@ provider = TracerProvider()
 trace.set_tracer_provider(provider)
 tracer = trace.get_tracer(__name__)
 from functools import wraps
+import os
 import logging
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+logging.basicConfig(
+    filename=os.path.join(parent_dir,"results","crewai","log","react_gaia-4o-t20.log"),  
+    filemode='a',
+    level=logging.INFO, 
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
+    datefmt='%Y-%m-%d %H:%M:%S'
+    )
 
 def traced_tool(fn, tool_name=None):
     @wraps(fn)
@@ -44,16 +53,16 @@ from crewai_tools import LlamaIndexTool
 from llama_index.readers.file import VideoAudioReader,ImageReader
 from llama_index.core import SimpleDirectoryReader
 from pathlib import Path
-from langchain_openai import ChatOpenAI
+# from langchain_openai import ChatOpenAI
 from crewai.knowledge.source.csv_knowledge_source import CSVKnowledgeSource
 from dotenv import load_dotenv
 load_dotenv()
 import time 
 import weave
-import psutil
+# import psutil
 
 # CPU 8-17
-psutil.Process(os.getpid()).cpu_affinity(list(range(8, 18)))
+# psutil.Process(os.getpid()).cpu_affinity(list(range(8, 18)))
 
 
 class ImagePromptSchema(BaseModel):
@@ -274,8 +283,51 @@ Txt_tool=FunctionTool.from_defaults(txt_load,name="TxtLoader",description="usefu
 Code_execute=FunctionTool.from_defaults(PythonREPLTool,name="Code_excute",description="useful for when you need to execute a python code")
 Image_tool=FunctionTool.from_defaults(ImageLoader,name="vision_tool",description="useful for when you need to load a image document from a path")
 
+# irrelevant tools
+from agents.irrelevant_tools.irrelevant_tools import twoSum
+from agents.irrelevant_tools.irrelevant_tools import lengthOfLongestSubstring
+from agents.irrelevant_tools.irrelevant_tools import findMedianSortedArrays
+from agents.irrelevant_tools.irrelevant_tools import longestPalindrome
+from agents.irrelevant_tools.irrelevant_tools import convertZ
+from agents.irrelevant_tools.irrelevant_tools import reverseX
+from agents.irrelevant_tools.irrelevant_tools import myAtoi
+from agents.irrelevant_tools.irrelevant_tools import isPalindrome
+from agents.irrelevant_tools.irrelevant_tools import isMatch
+from agents.irrelevant_tools.irrelevant_tools import maxArea
+
+from agents.irrelevant_tools.irrelevant_tools import longestCommonPrefix
+from agents.irrelevant_tools.irrelevant_tools import threeSum
+from agents.irrelevant_tools.irrelevant_tools import isValidBrackets
+from agents.irrelevant_tools.irrelevant_tools import generateParenthesis
+from agents.irrelevant_tools.irrelevant_tools import groupAnagrams
+from agents.irrelevant_tools.irrelevant_tools import lengthOfLastWord
+from agents.irrelevant_tools.irrelevant_tools import addBinary
+from agents.irrelevant_tools.irrelevant_tools import minDistance
+from agents.irrelevant_tools.irrelevant_tools import largestNumber
+from agents.irrelevant_tools.irrelevant_tools import reverseString
 
 
+twoSum = FunctionTool.from_defaults(twoSum, name="twoSum", description=twoSum.__doc__)
+lengthOfLongestSubstring = FunctionTool.from_defaults(lengthOfLongestSubstring, name="lengthOfLongestSubstring", description=lengthOfLongestSubstring.__doc__)
+findMedianSortedArrays = FunctionTool.from_defaults(findMedianSortedArrays, name="findMedianSortedArrays", description=findMedianSortedArrays.__doc__)
+longestPalindrome = FunctionTool.from_defaults(longestPalindrome, name="longestPalindrome", description=longestPalindrome.__doc__)
+convertZ = FunctionTool.from_defaults(convertZ, name="convertZ", description=convertZ.__doc__)
+reverseX = FunctionTool.from_defaults(reverseX, name="reverseX", description=reverseX.__doc__)
+myAtoi = FunctionTool.from_defaults(myAtoi, name="myAtoi", description=myAtoi.__doc__)
+isPalindrome = FunctionTool.from_defaults(isPalindrome, name="isPalindrome", description=isPalindrome.__doc__)
+isMatch = FunctionTool.from_defaults(isMatch, name="isMatch", description=isMatch.__doc__)
+maxArea = FunctionTool.from_defaults(maxArea, name="maxArea", description=maxArea.__doc__)
+
+longestCommonPrefix = FunctionTool.from_defaults(longestCommonPrefix, name="longestCommonPrefix", description=longestCommonPrefix.__doc__)
+threeSum = FunctionTool.from_defaults(threeSum, name="threeSum", description=threeSum.__doc__)
+isValidBrackets = FunctionTool.from_defaults(isValidBrackets, name="isValidBrackets", description=isValidBrackets.__doc__)
+generateParenthesis = FunctionTool.from_defaults(generateParenthesis, name="generateParenthesis", description=generateParenthesis.__doc__)
+groupAnagrams = FunctionTool.from_defaults(groupAnagrams, name="groupAnagrams", description=groupAnagrams.__doc__)
+lengthOfLastWord = FunctionTool.from_defaults(lengthOfLastWord, name="lengthOfLastWord", description=lengthOfLastWord.__doc__)
+addBinary = FunctionTool.from_defaults(addBinary, name="addBinary", description=addBinary.__doc__)
+minDistance = FunctionTool.from_defaults(minDistance, name="minDistance", description=minDistance.__doc__)
+largestNumber = FunctionTool.from_defaults(largestNumber, name="largestNumber", description=largestNumber.__doc__)
+reverseString = FunctionTool.from_defaults(reverseString, name="reverseString", description=reverseString.__doc__)
  
 class Workflow(Crew):
         def __init__(self,
@@ -356,7 +408,7 @@ def CrewAIAgent(agent_type,moa_num=3):
     llm0 = LLM(
     model="openai/gpt-4o",  
     api_key=os.getenv("OPENAI_API_KEY"),
-    base_url="https://api3.apifans.com/v1",
+    base_url=os.environ['OPENAI_BASE_URL'],
     temperature=0,
     top_k=1
     )
@@ -377,6 +429,28 @@ def CrewAIAgent(agent_type,moa_num=3):
     txt_tool = LlamaIndexTool.from_tool(Txt_tool)#txt tool using python-docx to read docx file
     code_execute_tool = LlamaIndexTool.from_tool(Code_execute)#python code execute tool using python exec
     image_tool=LlamaIndexTool.from_tool(Image_tool)
+
+    # irrelevant tools
+    twoSumTool = LlamaIndexTool.from_tool(twoSum)
+    lengthOfLongestSubstringTool = LlamaIndexTool.from_tool(lengthOfLongestSubstring)
+    findMedianSortedArraysTool = LlamaIndexTool.from_tool(findMedianSortedArrays)
+    longestPalindromeTool = LlamaIndexTool.from_tool(longestPalindrome)
+    convertZTool = LlamaIndexTool.from_tool(convertZ)
+    reverseXTool = LlamaIndexTool.from_tool(reverseX)
+    myAtoiTool = LlamaIndexTool.from_tool(myAtoi)
+    isPalindromeTool = LlamaIndexTool.from_tool(isPalindrome)
+    isMatchTool = LlamaIndexTool.from_tool(isMatch)
+    maxAreaTool = LlamaIndexTool.from_tool(maxArea)
+    longestCommonPrefixTool = LlamaIndexTool.from_tool(longestCommonPrefix)
+    threeSumTool = LlamaIndexTool.from_tool(threeSum)
+    isValidBracketsTool = LlamaIndexTool.from_tool(isValidBrackets)
+    generateParenthesisTool = LlamaIndexTool.from_tool(generateParenthesis)
+    groupAnagramsTool = LlamaIndexTool.from_tool(groupAnagrams)
+    lengthOfLastWordTool = LlamaIndexTool.from_tool(lengthOfLastWord)
+    addBinaryTool = LlamaIndexTool.from_tool(addBinary)
+    minDistanceTool = LlamaIndexTool.from_tool(minDistance)
+    largestNumberTool = LlamaIndexTool.from_tool(largestNumber)
+    reverseStringTool = LlamaIndexTool.from_tool(reverseString)
 
 
     
@@ -399,6 +473,28 @@ def CrewAIAgent(agent_type,moa_num=3):
     image_tool._run = traced_tool(image_tool._run,tool_name="vision_tool")
     code_execute_tool._run = traced_tool(code_execute_tool._run,tool_name="python_tool")
 
+    # irrelevant tools
+    twoSumTool._run = traced_tool(twoSumTool._run, tool_name="twoSum")
+    lengthOfLongestSubstringTool._run = traced_tool(lengthOfLongestSubstringTool._run, tool_name="lengthOfLongestSubstring")
+    findMedianSortedArraysTool._run = traced_tool(findMedianSortedArraysTool._run, tool_name="findMedianSortedArrays")
+    longestPalindromeTool._run = traced_tool(longestPalindromeTool._run, tool_name="longestPalindrome")
+    convertZTool._run = traced_tool(convertZTool._run, tool_name="convertZ")
+    reverseXTool._run = traced_tool(reverseXTool._run, tool_name="reverseX")
+    myAtoiTool._run = traced_tool(myAtoiTool._run, tool_name="myAtoi")
+    isPalindromeTool._run = traced_tool(isPalindromeTool._run, tool_name="isPalindrome")
+    isMatchTool._run = traced_tool(isMatchTool._run, tool_name="isMatch")
+    maxAreaTool._run = traced_tool(maxAreaTool._run, tool_name="maxArea")
+    longestCommonPrefixTool._run = traced_tool(longestCommonPrefixTool._run, tool_name="longestCommonPrefix")
+    threeSumTool._run = traced_tool(threeSumTool._run, tool_name="threeSum")
+    isValidBracketsTool._run = traced_tool(isValidBracketsTool._run, tool_name="isValidBrackets")
+    generateParenthesisTool._run = traced_tool(generateParenthesisTool._run, tool_name="generateParenthesis")
+    groupAnagramsTool._run = traced_tool(groupAnagramsTool._run, tool_name="groupAnagrams")
+    lengthOfLastWordTool._run = traced_tool(lengthOfLastWordTool._run, tool_name="lengthOfLastWord")
+    addBinaryTool._run = traced_tool(addBinaryTool._run, tool_name="addBinary")
+    minDistanceTool._run = traced_tool(minDistanceTool._run, tool_name="minDistance")
+    largestNumberTool._run = traced_tool(largestNumberTool._run, tool_name="largestNumber")
+    reverseStringTool._run = traced_tool(reverseStringTool._run, tool_name="reverseString")
+
 
     tools = [
         web_browser_tool,
@@ -411,6 +507,29 @@ def CrewAIAgent(agent_type,moa_num=3):
         docx_tool,
         xlsx_tool,
         code_execute_tool,
+
+        twoSumTool,
+        lengthOfLongestSubstringTool,
+        findMedianSortedArraysTool,
+        longestPalindromeTool,
+        convertZTool,
+        reverseXTool,
+        myAtoiTool,
+        isPalindromeTool,
+        isMatchTool,
+        maxAreaTool,
+
+        longestCommonPrefixTool,
+        threeSumTool,
+        isValidBracketsTool,
+        generateParenthesisTool,
+        groupAnagramsTool,
+        lengthOfLastWordTool,
+        addBinaryTool,
+        minDistanceTool,
+        largestNumberTool,
+        reverseStringTool,
+
         # image_tool
     ]
 
@@ -454,21 +573,21 @@ def CrewAIAgent(agent_type,moa_num=3):
 
     elif agent_type == 'MoA':
         llm1=LLM(
-            model="openai/meta-llama/Llama-3.3-70B-Instruct-Turbo",  
-            api_key=os.getenv("TOGETHER_API_KEY"),
-            base_url="https://api.together.xyz/v1",
-            emperature=0,
+            model="openai/THUDM/GLM-Z1-Rumination-32B-0414",  
+            api_key=os.getenv("SILICON_FLOW_API_KEY"),
+            base_url="https://api.siliconflow.cn/v1",
+            temperature=0,
         )
         llm2=LLM(
-            model="openai/Qwen/Qwen2.5-7B-Instruct-Turbo",  
-            api_key=os.getenv("TOGETHER_API_KEY"),
-            base_url="https://api.together.xyz/v1",
+            model="openai/Pro/Qwen/Qwen2.5-7B-Instruct",  
+            api_key=os.getenv("SILICON_FLOW_API_KEY"),
+            base_url="https://api.siliconflow.cn/v1",
             temperature=0,
         )
         llm3=LLM(
             model="openai/deepseek-ai/DeepSeek-V3",  
-            api_key=os.getenv("TOGETHER_API_KEY"),
-            base_url="https://api.together.xyz/v1",
+            api_key=os.getenv("SILICON_FLOW_API_KEY"),
+            base_url="https://api.siliconflow.cn/v1",
             temperature=0,
         )
         agent1=Agent(
@@ -478,14 +597,14 @@ def CrewAIAgent(agent_type,moa_num=3):
             tools=[],
             verbose=True,
             allow_delegation=False,
-            llm=llm1
+            llm=llm2
         )
         agent2=Agent(
             role="agent2",
             goal="You are one of the agents, you have to make your answers as perfect as possible, there will be a management agent to choose the most perfect answer among the three agents as output, you have to do your best to be selected",
             backstory="You need to be the best",
             tools=[],
-            llm=llm2,
+            llm=llm3,
             allow_delegation=False,
             verbose=True
         )
@@ -494,7 +613,7 @@ def CrewAIAgent(agent_type,moa_num=3):
             goal="You are one of the agents, you have to make your answers as perfect as possible, there will be a management agent to choose the most perfect answer among the three agents as output, you have to do your best to be selected",
             backstory="You need to be the best",
             tools=[],
-            llm=llm3,
+            llm=llm1,
             allow_delegation=False,
             verbose=True
         )
@@ -695,3 +814,6 @@ def CrewAIAgent(agent_type,moa_num=3):
         print("Invalid agent type. Please choose from 'ReAct', 'RAG', or 'MoA'.")    
     return workflow
 
+if __name__ == "__main__":
+    workflow = CrewAIAgent('MoA', moa_num=3)
+    workflow.omni_run_MOA(task='instruction: How did US states get their names?')

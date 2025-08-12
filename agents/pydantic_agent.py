@@ -27,8 +27,9 @@ from docx import Document
 from pathlib import Path
 from httpx import AsyncClient
 custom_http_client = AsyncClient(timeout=300)
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 import os
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 import dotenv
 dotenv.load_dotenv(os.path.join(parent_dir,".env"))
 import logging
@@ -66,6 +67,28 @@ def traced_tool(tool_name=None):
                 logging.info(f"tool_name: {name}, tool_time: {(span.end_time - span.start_time)/1e9}") 
         return wrapper
     return decorator
+
+
+def traced_tool_fn(fn, tool_name=None):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        span = tracer.start_span(fn.__name__)
+        span.set_attribute("input", str(args))
+        try:
+            result = fn(*args, **kwargs)
+            span.set_attribute("output", str(result)[:100])  # 记录截断的输出
+            return result
+        except Exception as e:
+            span.record_exception(e)
+            raise
+        finally:
+            span.end()
+            if tool_name:
+                name = tool_name
+                logging.info(f"tool_name: {name}, tool_time: {(span.end_time - span.start_time)/1e9}") 
+            else:
+                print(f"{fn.__name__} finished, time: {(span.end_time - span.start_time)/1e9}")
+    return wrapper
 
 def communication_size_async(func):
     @wraps(func)
@@ -329,8 +352,50 @@ def TxtLoader(path:str):
         return txt_str
     except Exception as e:
         return f"error: {str(e)}"
+    
+from agents.irrelevant_tools.irrelevant_tools import twoSum
+from agents.irrelevant_tools.irrelevant_tools import lengthOfLongestSubstring
+from agents.irrelevant_tools.irrelevant_tools import findMedianSortedArrays
+from agents.irrelevant_tools.irrelevant_tools import longestPalindrome
+from agents.irrelevant_tools.irrelevant_tools import convertZ
+from agents.irrelevant_tools.irrelevant_tools import reverseX
+from agents.irrelevant_tools.irrelevant_tools import myAtoi
+from agents.irrelevant_tools.irrelevant_tools import isPalindrome
+from agents.irrelevant_tools.irrelevant_tools import isMatch
+from agents.irrelevant_tools.irrelevant_tools import maxArea
 
+from agents.irrelevant_tools.irrelevant_tools import longestCommonPrefix
+from agents.irrelevant_tools.irrelevant_tools import threeSum
+from agents.irrelevant_tools.irrelevant_tools import isValidBrackets
+from agents.irrelevant_tools.irrelevant_tools import generateParenthesis
+from agents.irrelevant_tools.irrelevant_tools import groupAnagrams
+from agents.irrelevant_tools.irrelevant_tools import lengthOfLastWord
+from agents.irrelevant_tools.irrelevant_tools import addBinary
+from agents.irrelevant_tools.irrelevant_tools import minDistance
+from agents.irrelevant_tools.irrelevant_tools import largestNumber
+from agents.irrelevant_tools.irrelevant_tools import reverseString
 
+twoSumTool = traced_tool_fn(twoSum, tool_name='twoSum')
+lengthOfLongestSubstringTool = traced_tool_fn(lengthOfLongestSubstring, tool_name='lengthOfLongestSubstring')
+findMedianSortedArraysTool = traced_tool_fn(findMedianSortedArrays, tool_name='findMedianSortedArrays')
+longestPalindromeTool = traced_tool_fn(longestPalindrome, tool_name='longestPalindrome')
+convertZTool = traced_tool_fn(convertZ, tool_name='convertZ')
+reverseXTool = traced_tool_fn(reverseX, tool_name='reverseX')
+myAtoiTool = traced_tool_fn(myAtoi, tool_name='myAtoi')
+isPalindromeTool = traced_tool_fn(isPalindrome, tool_name='isPalindrome')
+isMatchTool = traced_tool_fn(isMatch, tool_name='isMatch')
+maxAreaTool = traced_tool_fn(maxArea, tool_name='maxArea')
+
+longestCommonPrefixTool = traced_tool_fn(longestCommonPrefix, tool_name='longestCommonPrefix')
+threeSumTool = traced_tool_fn(threeSum, tool_name='threeSum')
+isValidBracketsTool = traced_tool_fn(isValidBrackets, tool_name='isValidBrackets')
+generateParenthesisTool = traced_tool_fn(generateParenthesis, tool_name='generateParenthesis')
+groupAnagramsTool = traced_tool_fn(groupAnagrams, tool_name='groupAnagrams')
+lengthOfLastWordTool = traced_tool_fn(lengthOfLastWord, tool_name='lengthOfLastWord')
+addBinaryTool = traced_tool_fn(addBinary, tool_name='addBinary')
+minDistanceTool = traced_tool_fn(minDistance, tool_name='minDistance')
+largestNumberTool = traced_tool_fn(largestNumber, tool_name='largestNumber')
+reverseStringTool = traced_tool_fn(reverseString, tool_name='reverseString')
 
 class MoAWorkflow():
 
@@ -587,7 +652,31 @@ def PydanticAgent(model_name,agent_type, api_key=None,):
                      Tool(XlsxLoader, takes_ctx=False),
                      Tool(DocLoader, takes_ctx=False),
                      Tool(TxtLoader, takes_ctx=False),
-                     Tool(PythonTool, takes_ctx=False)
+                     Tool(PythonTool, takes_ctx=False),
+
+                    # irrelevant tools
+                    # Tool(twoSumTool, takes_ctx=False),
+                    # Tool(lengthOfLongestSubstringTool, takes_ctx=False),
+                    # Tool(findMedianSortedArraysTool, takes_ctx=False),
+                    # Tool(longestPalindromeTool, takes_ctx=False),
+                    # Tool(convertZTool, takes_ctx=False),
+                    # Tool(reverseXTool, takes_ctx=False),
+                    # Tool(myAtoiTool, takes_ctx=False),
+                    # Tool(isPalindromeTool, takes_ctx=False),
+                    # Tool(isMatchTool, takes_ctx=False),
+                    # Tool(maxAreaTool, takes_ctx=False),
+
+                    # Tool(longestCommonPrefixTool, takes_ctx=False),
+                    # Tool(threeSumTool, takes_ctx=False),
+                    # Tool(isValidBracketsTool, takes_ctx=False),
+                    # Tool(generateParenthesisTool, takes_ctx=False),
+                    # Tool(groupAnagramsTool, takes_ctx=False),
+                    # Tool(lengthOfLastWordTool, takes_ctx=False),
+                    # Tool(addBinaryTool, takes_ctx=False),
+                    # Tool(minDistanceTool, takes_ctx=False),
+                    # Tool(largestNumberTool, takes_ctx=False),
+                    # Tool(reverseStringTool, takes_ctx=False),
+
                     ]
         )
 

@@ -404,6 +404,51 @@ def AudioLoader(path: str) -> str:
     except Exception as e:
         return f"Error: {e}"
 
+# irrelevant tools
+from agents.irrelevant_tools.irrelevant_tools import twoSum
+from agents.irrelevant_tools.irrelevant_tools import lengthOfLongestSubstring
+from agents.irrelevant_tools.irrelevant_tools import findMedianSortedArrays
+from agents.irrelevant_tools.irrelevant_tools import longestPalindrome
+from agents.irrelevant_tools.irrelevant_tools import convertZ
+from agents.irrelevant_tools.irrelevant_tools import reverseX
+from agents.irrelevant_tools.irrelevant_tools import myAtoi
+from agents.irrelevant_tools.irrelevant_tools import isPalindrome
+from agents.irrelevant_tools.irrelevant_tools import isMatch
+from agents.irrelevant_tools.irrelevant_tools import maxArea
+
+from agents.irrelevant_tools.irrelevant_tools import longestCommonPrefix
+from agents.irrelevant_tools.irrelevant_tools import threeSum
+from agents.irrelevant_tools.irrelevant_tools import isValidBrackets
+from agents.irrelevant_tools.irrelevant_tools import generateParenthesis
+from agents.irrelevant_tools.irrelevant_tools import groupAnagrams
+from agents.irrelevant_tools.irrelevant_tools import lengthOfLastWord
+from agents.irrelevant_tools.irrelevant_tools import addBinary
+from agents.irrelevant_tools.irrelevant_tools import minDistance
+from agents.irrelevant_tools.irrelevant_tools import largestNumber
+from agents.irrelevant_tools.irrelevant_tools import reverseString
+
+twoSum = traced_tool(twoSum)
+lengthOfLongestSubstring = traced_tool(lengthOfLongestSubstring)
+findMedianSortedArrays = traced_tool(findMedianSortedArrays)
+longestPalindrome = traced_tool(longestPalindrome)
+convertZ = traced_tool(convertZ)
+reverseX = traced_tool(reverseX)
+myAtoi = traced_tool(myAtoi)
+isPalindrome = traced_tool(isPalindrome)
+isMatch = traced_tool(isMatch)
+maxArea = traced_tool(maxArea)
+
+longestCommonPrefix = traced_tool(longestCommonPrefix)
+threeSum = traced_tool(threeSum)
+isValidBrackets = traced_tool(isValidBrackets)
+generateParenthesis = traced_tool(generateParenthesis)
+groupAnagrams = traced_tool(groupAnagrams)
+lengthOfLastWord = traced_tool(lengthOfLastWord)
+addBinary = traced_tool(addBinary)
+minDistance = traced_tool(minDistance)
+largestNumber = traced_tool(largestNumber)
+reverseString = traced_tool(reverseString)
+
 
 class RetrieverEvent(Event):
     """Result of running retrieval"""
@@ -653,7 +698,30 @@ def load_llamaIndexagent(model_name, workflow, api_key=None):
                    Mp4Loader,
                    MovLoader,
                    AudioLoader,
-                   EvalCodeInterpreterToolSpec().code_interpreter
+                   EvalCodeInterpreterToolSpec().code_interpreter,
+
+                    # irrelevant tools
+                    # twoSum,
+                    # lengthOfLongestSubstring,
+                    # findMedianSortedArrays,
+                    # longestPalindrome,
+                    # convertZ,
+                    # reverseX,
+                    # myAtoi,
+                    # isPalindrome,
+                    # isMatch,
+                    # maxArea,
+
+                    # longestCommonPrefix,
+                    # threeSum,
+                    # isValidBrackets,
+                    # generateParenthesis,
+                    # groupAnagrams,
+                    # lengthOfLastWord,
+                    # addBinary,
+                    # minDistance,
+                    # largestNumber,
+                    # reverseString,
                 ],
         )
         # wf = AgentWorkflow.from_tools_or_functions(
@@ -723,7 +791,7 @@ if __name__ == "__main__":
     
     
     agent = load_llamaIndexagent('gpt-4o', 'ReAct')
-    result = agent.omni_run(task="question: How many applicants for the job in the PDF are only missing a single qualification?, file_name: bfcd99e1-0690-4b53-a85c-0174a8629083.zip, file_path: /root/autodl-tmp/cache/datasets/downloads/050db468177877ed356ec520839e4ccac59b733f664dc355972624202880a5db")
+    result = agent.omni_run(task="search information about UCAS using google")
     print(result)
 
     # agent = load_llamaIndexagent('deepseek-chat', 'MoA')

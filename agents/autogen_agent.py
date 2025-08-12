@@ -9,7 +9,7 @@ import tempfile
 temp_dir = tempfile.TemporaryDirectory()
 from autogen import UserProxyAgent,ConversableAgent
 import asyncio
-import nest_asyncio
+# import nest_asyncio
 from datasets import load_dataset
 from PyPDF2 import PdfReader
 from dataclasses import dataclass
@@ -25,7 +25,7 @@ from typing import cast
 from transformers import DonutProcessor, VisionEncoderDecoderModel
 import re
 from PIL import Image
-from pympler import asizeof
+# from pympler import asizeof
 from pathlib import Path
 import os
 import logging
@@ -34,6 +34,8 @@ from functools import wraps
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, ConsoleSpanExporter
+from dotenv import load_dotenv
+load_dotenv()
 
 '''
 weave.init('autogen')
@@ -263,7 +265,7 @@ def ReAct(model_name,api_key):
     
     @traced_tool(tool_name="video_tool")
     def video_load(path:str):
-        video = AudioSegment.from_file(Path(path), format=file[-3:])
+        video = AudioSegment.from_file(Path(path), format=path[-3:])
         audio = video.split_to_mono()[0]
         file_str = path[:-4] + ".mp3"
         audio.export(file_str, format="mp3")
@@ -284,12 +286,101 @@ def ReAct(model_name,api_key):
     load_audio = FunctionTool(
         audio_load, description="useful when you need to read mp3 documents"
     )
+
+    # irrelevant tools
+    from agents.irrelevant_tools.irrelevant_tools import twoSum
+    from agents.irrelevant_tools.irrelevant_tools import lengthOfLongestSubstring
+    from agents.irrelevant_tools.irrelevant_tools import findMedianSortedArrays
+    from agents.irrelevant_tools.irrelevant_tools import longestPalindrome
+    from agents.irrelevant_tools.irrelevant_tools import convertZ
+    from agents.irrelevant_tools.irrelevant_tools import reverseX
+    from agents.irrelevant_tools.irrelevant_tools import myAtoi
+    from agents.irrelevant_tools.irrelevant_tools import isPalindrome
+    from agents.irrelevant_tools.irrelevant_tools import isMatch
+    from agents.irrelevant_tools.irrelevant_tools import maxArea
+    from agents.irrelevant_tools.irrelevant_tools import longestCommonPrefix
+    from agents.irrelevant_tools.irrelevant_tools import threeSum
+    from agents.irrelevant_tools.irrelevant_tools import isValidBrackets
+    from agents.irrelevant_tools.irrelevant_tools import generateParenthesis
+    from agents.irrelevant_tools.irrelevant_tools import groupAnagrams
+    from agents.irrelevant_tools.irrelevant_tools import lengthOfLastWord
+    from agents.irrelevant_tools.irrelevant_tools import addBinary
+    from agents.irrelevant_tools.irrelevant_tools import minDistance
+    from agents.irrelevant_tools.irrelevant_tools import largestNumber
+    from agents.irrelevant_tools.irrelevant_tools import reverseString
+
+    twoSum = traced_tool(twoSum)
+    lengthOfLongestSubstring = traced_tool(lengthOfLongestSubstring)
+    findMedianSortedArrays = traced_tool(findMedianSortedArrays)
+    longestPalindrome = traced_tool(longestPalindrome)
+    convertZ = traced_tool(convertZ)
+    reverseX = traced_tool(reverseX)
+    myAtoi = traced_tool(myAtoi)
+    isPalindrome = traced_tool(isPalindrome)
+    isMatch = traced_tool(isMatch)
+    maxArea = traced_tool(maxArea)
+
+    longestCommonPrefix = traced_tool(longestCommonPrefix)
+    threeSum = traced_tool(threeSum)
+    isValidBrackets = traced_tool(isValidBrackets)
+    generateParenthesis = traced_tool(generateParenthesis)
+    groupAnagrams = traced_tool(groupAnagrams)
+    lengthOfLastWord = traced_tool(lengthOfLastWord)
+    addBinary = traced_tool(addBinary)
+    minDistance = traced_tool(minDistance)
+    largestNumber = traced_tool(largestNumber)
+    reverseString = traced_tool(reverseString)
+
+    twoSum = FunctionTool(twoSum, description=twoSum.__doc__)
+    lengthOfLongestSubstring = FunctionTool(lengthOfLongestSubstring, description=lengthOfLongestSubstring.__doc__)
+    findMedianSortedArrays = FunctionTool(findMedianSortedArrays, description=findMedianSortedArrays.__doc__)
+    longestPalindrome = FunctionTool(longestPalindrome, description=longestPalindrome.__doc__)
+    convertZ = FunctionTool(convertZ, description=convertZ.__doc__)
+    reverseX = FunctionTool(reverseX, description=reverseX.__doc__)
+    myAtoi = FunctionTool(myAtoi, description=myAtoi.__doc__)
+    isPalindrome = FunctionTool(isPalindrome, description=isPalindrome.__doc__)
+    isMatch = FunctionTool(isMatch, description=isMatch.__doc__)
+    maxArea = FunctionTool(maxArea, description=maxArea.__doc__)
+    longestCommonPrefix = FunctionTool(longestCommonPrefix, description=longestCommonPrefix.__doc__)
+    threeSum = FunctionTool(threeSum, description=threeSum.__doc__)
+    isValidBrackets = FunctionTool(isValidBrackets, description=isValidBrackets.__doc__)
+    generateParenthesis = FunctionTool(generateParenthesis, description=generateParenthesis.__doc__)
+    groupAnagrams = FunctionTool(groupAnagrams, description=groupAnagrams.__doc__)
+    lengthOfLastWord = FunctionTool(lengthOfLastWord, description=lengthOfLastWord.__doc__)
+    addBinary = FunctionTool(addBinary, description=addBinary.__doc__)
+    minDistance = FunctionTool(minDistance, description=minDistance.__doc__)
+    largestNumber = FunctionTool(largestNumber, description=largestNumber.__doc__)
+    reverseString = FunctionTool(reverseString, description=reverseString.__doc__)
+
     ReAct_prompt = "You are a ReAct-based assistant.\nYou analyze the question, decide whether to call a tool or directly answer, and then respond accordingly.\nUse the following format:Question: the input question or request\nThought: you should always think about what to do\nAction: the action to take (if any)\nAction Input: the input to the action (e.g., search query)\nObservation: the result of the action\n... (this process can repeat multiple times)\nThought: I now know the final answer\nFinal Answer: the final answer to the original input question or request\nBegin!\nQuestion: {input}\n"
     
     agent = AssistantAgent(
         name="react_agent",
         model_client=model_client,
-        tools=[python_tool,google_search_tool,pdf_load,csv_load,xlsx_load,txt_load,docs_load,load_image,load_video,load_audio],
+        tools=[python_tool,google_search_tool,pdf_load,csv_load,xlsx_load,txt_load,docs_load,load_image,load_video,load_audio,
+                # irrelevant tools
+                # twoSum,
+                # lengthOfLongestSubstring,
+                # findMedianSortedArrays,
+                # longestPalindrome,
+                # convertZ,
+                # reverseX,
+                # myAtoi,
+                # isPalindrome,
+                # isMatch,
+                # maxArea,
+
+                # longestCommonPrefix,
+                # threeSum,
+                # isValidBrackets,
+                # generateParenthesis,
+                # groupAnagrams,
+                # lengthOfLastWord,
+                # addBinary,
+                # minDistance,
+                # largestNumber,
+                # reverseString,
+               ],
         system_message=ReAct_prompt,
         reflect_on_tool_use=True,
         model_client_stream=False,
@@ -497,7 +588,7 @@ class autogen_agent:
         elif self.agent_type == "MoA":
             self.agent=None
         elif self.agent_type == "ReAct":
-            self.agent=ReAct(model_name)
+            self.agent=ReAct(model_name, api_key=os.environ['OPENAI_API_KEY'])
         else:
             print("agent type not supported")
             self.agent=None

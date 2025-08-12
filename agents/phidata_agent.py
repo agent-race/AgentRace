@@ -41,9 +41,8 @@ from phi.vectordb.chroma import ChromaDb
 from phi.embedder.sentence_transformer import SentenceTransformerEmbedder
 # from agno.vectordb.qdrant import Qdrant
 # from phi.embedder.openai import OpenAIEmbedder
-
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 import os
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 import dotenv
 dotenv.load_dotenv(os.path.join(parent_dir,".env"))
 from typing import List, Iterator
@@ -432,6 +431,30 @@ class FileLoadTools(Toolkit):
 GoogleSearch.google_search = traced_tool(GoogleSearch.google_search, tool_name="web_browser_tool")
 PythonTools.run_python_code = traced_tool(PythonTools.run_python_code, tool_name="python_tool")
 
+# irrelevant tools
+from agents.irrelevant_tools.irrelevant_tools_phidata import IrrelevantTools
+# IrrelevantTools.twoSum = traced_tool(IrrelevantTools.twoSum)
+# IrrelevantTools.lengthOfLongestSubstring = traced_tool(IrrelevantTools.lengthOfLongestSubstring)
+# IrrelevantTools.findMedianSortedArrays = traced_tool(IrrelevantTools.findMedianSortedArrays)
+# IrrelevantTools.longestPalindrome = traced_tool(IrrelevantTools.longestPalindrome)
+# IrrelevantTools.convertZ = traced_tool(IrrelevantTools.convertZ)
+# IrrelevantTools.reverseX = traced_tool(IrrelevantTools.reverseX)
+# IrrelevantTools.myAtoi = traced_tool(IrrelevantTools.myAtoi)
+# IrrelevantTools.isPalindrome = traced_tool(IrrelevantTools.isPalindrome)
+# IrrelevantTools.isMatch = traced_tool(IrrelevantTools.isMatch)
+# IrrelevantTools.maxArea = traced_tool(IrrelevantTools.maxArea)
+
+# IrrelevantTools.longestCommonPrefix =traced_tool(IrrelevantTools.longestCommonPrefix)
+# IrrelevantTools.threeSum =traced_tool(IrrelevantTools.threeSum)
+# IrrelevantTools.isValidBrackets =traced_tool(IrrelevantTools.isValidBrackets)
+# IrrelevantTools.generateParenthesis =traced_tool(IrrelevantTools.generateParenthesis)
+# IrrelevantTools.groupAnagrams =traced_tool(IrrelevantTools.groupAnagrams)
+# IrrelevantTools.lengthOfLastWord =traced_tool(IrrelevantTools.lengthOfLastWord)
+# IrrelevantTools.addBinary =traced_tool(IrrelevantTools.addBinary)
+# IrrelevantTools.minDistance =traced_tool(IrrelevantTools.minDistance)
+# IrrelevantTools.largestNumber =traced_tool(IrrelevantTools.largestNumber)
+# IrrelevantTools.reverseString =traced_tool(IrrelevantTools.reverseString)
+
 
 Agent.search_knowledge_base = trace_retrieve(Agent.search_knowledge_base)
 
@@ -454,7 +477,10 @@ def PhidataAgent(model_name, agent_type, api_key=None):
             model=model,
             tools=[GoogleSearch(), 
                    FileLoadTools(),
-                   PythonTools(run_code=True)],
+                   PythonTools(run_code=True),
+                    # irrelevant tools
+                    # IrrelevantTools()    
+                   ],
             instructions=["You are a ReAct-based assistant.\nYou analyze the question, decide whether to call a tool or directly answer, and then respond accordingly.\nUse the following format:Question: the input question or request\nThought: you should always think about what to do\nAction: the action to take (if any)\nAction Input: the input to the action (e.g., search query)\nObservation: the result of the action\n... (this process can repeat multiple times)\nThought: I now know the final answer\nFinal Answer: the final answer to the original input question or request\nBegin!\nQuestion: {input}\n"],
             show_tool_calls=True,
             markdown=True,

@@ -29,7 +29,8 @@ from pathlib import Path
 from collections.abc import Sequence
 from urllib.parse import urlparse
 import logging
-
+import dotenv
+dotenv.load_dotenv()
 together_api_key=os.getenv("TOGETHER_API_KEY")
 openai_api_key=os.getenv("OPENAI_API_KEY")
 google_api_key=os.getenv("GOOGLE_API_KEY")
@@ -262,7 +263,7 @@ def ReAct(name:str):
                 If `status` is `ServiceExecStatus.SUCCESS`,
                 the `content` contains the generated text description(s).
         """
-        return ServiceResponse(status=ServiceExecStatus.SUCCESS,content=openai_image_to_text(file_path,api_key=openai_api_key,model="gpt-4o").content)
+        return ServiceResponse(status=ServiceExecStatus.SUCCESS,content=openai_image_to_text(file_path,api_key=openai_api_key,model="gpt-4o-2024-08-06").content)
     
     
     @traced_tool
@@ -326,6 +327,75 @@ def ReAct(name:str):
     toolkit.add(audio_tool)
     toolkit.add(vision_tool)
     toolkit.add(web_browser_tool)
+    
+    # irrelevant tools
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import twoSum
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import lengthOfLongestSubstring
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import findMedianSortedArrays
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import longestPalindrome
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import convertZ
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import reverseX
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import myAtoi
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import isPalindrome
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import isMatch
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import maxArea
+
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import longestCommonPrefix
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import threeSum
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import isValidBrackets
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import generateParenthesis
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import groupAnagrams
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import lengthOfLastWord
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import addBinary
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import minDistance
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import largestNumber
+    from agents.irrelevant_tools.irrelevant_tools_agentscope import reverseString
+
+    twoSum = traced_tool(twoSum)
+    lengthOfLongestSubstring = traced_tool(lengthOfLongestSubstring)
+    findMedianSortedArrays = traced_tool(findMedianSortedArrays)
+    longestPalindrome = traced_tool(longestPalindrome)
+    convertZ = traced_tool(convertZ)
+    reverseX = traced_tool(reverseX)
+    myAtoi = traced_tool(myAtoi)
+    isPalindrome = traced_tool(isPalindrome)
+    isMatch = traced_tool(isMatch)
+    maxArea = traced_tool(maxArea)
+    longestCommonPrefix = traced_tool(longestCommonPrefix)
+    threeSum = traced_tool(threeSum)
+    isValidBrackets = traced_tool(isValidBrackets)
+    generateParenthesis = traced_tool(generateParenthesis)
+    groupAnagrams = traced_tool(groupAnagrams)
+    lengthOfLastWord = traced_tool(lengthOfLastWord)
+    addBinary = traced_tool(addBinary)
+    minDistance = traced_tool(minDistance)
+    largestNumber = traced_tool(largestNumber)
+    reverseString = traced_tool(reverseString)
+
+
+    # toolkit.add(twoSum)
+    # toolkit.add(lengthOfLongestSubstring)
+    # toolkit.add(findMedianSortedArrays)
+    # toolkit.add(longestPalindrome)
+    # toolkit.add(convertZ)
+    # toolkit.add(reverseX)
+    # toolkit.add(myAtoi)
+    # toolkit.add(isPalindrome)
+    # toolkit.add(isMatch)
+    # toolkit.add(maxArea)
+
+    # toolkit.add(longestCommonPrefix)
+    # toolkit.add(threeSum)
+    # toolkit.add(isValidBrackets)
+    # toolkit.add(generateParenthesis)
+    # toolkit.add(groupAnagrams)
+    # toolkit.add(lengthOfLastWord)
+    # toolkit.add(addBinary)
+    # toolkit.add(minDistance)
+    # toolkit.add(largestNumber)
+    # toolkit.add(reverseString)
+
+
     ReAct_Agent = ReActAgent(
         name="Friday",
         model_config_name=name,
@@ -1554,7 +1624,7 @@ def AgentScopeAgent(agent_type,api_key=None,moa_scale=3):
             "config_name": "openAI",
             "model_name": "gpt-4o-2024-08-06",
             "api_key": api_key  ,# API 密钥
-            #"client_args": {"base_url":"" , },
+            "client_args": {"base_url":os.environ['OPENAI_BASE_URL'] , },
             "generate_args": {"temperature": 0,},
         },],
         use_monitor=True,  # 是否监控 token 使用情况

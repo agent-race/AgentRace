@@ -2,22 +2,25 @@ from langchain_together import ChatTogether
 from langchain_openai import ChatOpenAI
 from langchain.agents import Tool,AgentExecutor,create_react_agent
 from langchain_core.tools import tool
+from langchain_core.tools import StructuredTool
 from langchain_core.prompts import PromptTemplate
 from langchain_experimental.tools import PythonREPLTool
-from langchain_community.document_loaders import PyPDFLoader,UnstructuredImageLoader,UnstructuredExcelLoader,Docx2txtLoader
+from langchain_community.document_loaders import PyPDFLoader,UnstructuredImageLoader,UnstructuredExcelLoader,Docx2txtLoader, UnstructuredFileLoader
 from langchain_community.document_loaders.assemblyai import TranscriptFormat,AssemblyAIAudioTranscriptLoader
 from langchain_community.document_loaders.csv_loader import CSVLoader
 from pydantic import BaseModel, Field
 import asyncio
-import nest_asyncio
+# import nest_asyncio
 from langchain_core.messages import HumanMessage, SystemMessage
-from pympler import asizeof
+# from pympler import asizeof
 import weave
 import json
 from transformers import DonutProcessor, VisionEncoderDecoderModel
 from PIL import Image
 import re
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 #from langchain.callbacks import OpenAICallbackHandler
 #handler = OpenAICallbackHandler()
@@ -70,6 +73,7 @@ class LangchainAgent:
         if model_name == "OpenAI":
             llm = ChatOpenAI(
                 api_key=os.environ["OPENAI_API_KEY"],
+                base_url=os.environ["OPENAI_URL"],
                 disable_streaming=True,
                 model="gpt-4o",
                 temperature=0
@@ -291,7 +295,8 @@ def ReACt(llm):
     def video_load(path: str) -> str:
         import whisper
         from pydub import AudioSegment
-        video = AudioSegment.from_file(Path(path), format=file[-3:])
+        from typing import cast
+        video = AudioSegment.from_file(Path(path), format=path[-3:])
         audio = video.split_to_mono()[0]
         file_str = path[:-4] + ".mp3"
         audio.export(file_str, format="mp3")
@@ -299,6 +304,75 @@ def ReACt(llm):
         model = cast(whisper.Whisper, model)
         result = model.transcribe(path)
         return result["text"]
+    
+    # irrelevant tools
+    from agents.irrelevant_tools.irrelevant_tools import twoSum
+    from agents.irrelevant_tools.irrelevant_tools import lengthOfLongestSubstring
+    from agents.irrelevant_tools.irrelevant_tools import findMedianSortedArrays
+    from agents.irrelevant_tools.irrelevant_tools import longestPalindrome
+    from agents.irrelevant_tools.irrelevant_tools import convertZ
+    from agents.irrelevant_tools.irrelevant_tools import reverseX
+    from agents.irrelevant_tools.irrelevant_tools import myAtoi
+    from agents.irrelevant_tools.irrelevant_tools import isPalindrome
+    from agents.irrelevant_tools.irrelevant_tools import isMatch
+    from agents.irrelevant_tools.irrelevant_tools import maxArea
+
+    from agents.irrelevant_tools.irrelevant_tools import longestCommonPrefix
+    from agents.irrelevant_tools.irrelevant_tools import threeSum
+    from agents.irrelevant_tools.irrelevant_tools import isValidBrackets
+    from agents.irrelevant_tools.irrelevant_tools import generateParenthesis
+    from agents.irrelevant_tools.irrelevant_tools import groupAnagrams
+    from agents.irrelevant_tools.irrelevant_tools import lengthOfLastWord
+    from agents.irrelevant_tools.irrelevant_tools import addBinary
+    from agents.irrelevant_tools.irrelevant_tools import minDistance
+    from agents.irrelevant_tools.irrelevant_tools import largestNumber
+    from agents.irrelevant_tools.irrelevant_tools import reverseString
+
+    twoSum = traced_tool(twoSum)
+    lengthOfLongestSubstring = traced_tool(lengthOfLongestSubstring)
+    findMedianSortedArrays = traced_tool(findMedianSortedArrays)
+    longestPalindrome = traced_tool(longestPalindrome)
+    convertZ = traced_tool(convertZ)
+    reverseX = traced_tool(reverseX)
+    myAtoi = traced_tool(myAtoi)
+    isPalindrome = traced_tool(isPalindrome)
+    isMatch = traced_tool(isMatch)
+    maxArea = traced_tool(maxArea)
+
+    longestCommonPrefix = traced_tool(longestCommonPrefix)
+    threeSum = traced_tool(threeSum)
+    isValidBrackets = traced_tool(isValidBrackets)
+    generateParenthesis = traced_tool(generateParenthesis)
+    groupAnagrams = traced_tool(groupAnagrams)
+    lengthOfLastWord = traced_tool(lengthOfLastWord)
+    addBinary = traced_tool(addBinary)
+    minDistance = traced_tool(minDistance)
+    largestNumber = traced_tool(largestNumber)
+    reverseString = traced_tool(reverseString)
+
+    StructuredTool.from_function
+    twoSumTool = StructuredTool.from_function(twoSum)
+    lengthOfLongestSubstringTool = StructuredTool.from_function(lengthOfLongestSubstring)
+    findMedianSortedArraysTool = StructuredTool.from_function(findMedianSortedArrays)
+    longestPalindromeTool = StructuredTool.from_function(longestPalindrome)
+    convertZTool = StructuredTool.from_function(convertZ)
+    reverseXTool = StructuredTool.from_function(reverseX)
+    myAtoiTool = StructuredTool.from_function(myAtoi)
+    isPalindromeTool = StructuredTool.from_function(isPalindrome)
+    isMatchTool = StructuredTool.from_function(isMatch)
+    maxAreaTool = StructuredTool.from_function(maxArea)
+
+    longestCommonPrefixTool = StructuredTool.from_function(longestCommonPrefix)
+    threeSumTool = StructuredTool.from_function(threeSum)
+    isValidBracketsTool = StructuredTool.from_function(isValidBrackets)
+    generateParenthesisTool = StructuredTool.from_function(generateParenthesis)
+    groupAnagramsTool = StructuredTool.from_function(groupAnagrams)
+    lengthOfLastWordTool = StructuredTool.from_function(lengthOfLastWord)
+    addBinaryTool = StructuredTool.from_function(addBinary)
+    minDistanceTool = StructuredTool.from_function(minDistance)
+    largestNumberTool = StructuredTool.from_function(largestNumber)
+    reverseStringTool = StructuredTool.from_function(reverseString)
+
 
     template = '''Answer the following questions as best you can. You have access to the following tools:
 
@@ -322,7 +396,30 @@ def ReACt(llm):
     Question: {input}
     Thought:{agent_scratchpad}'''
     prompt = PromptTemplate.from_template(template)
-    tools =[google_search,Python_excutor,pdf_load,docx_load,txt_load,mp3_load,image_load,csv_load,xlsx_load,video_load]
+    tools =[google_search,Python_excutor,pdf_load,docx_load,txt_load,mp3_load,image_load,csv_load,xlsx_load,video_load,
+            # irrelevant tools
+            # twoSumTool,
+            # lengthOfLongestSubstringTool,
+            # findMedianSortedArraysTool,
+            # longestPalindromeTool,
+            # convertZTool,
+            # reverseXTool,
+            # myAtoiTool,
+            # isPalindromeTool,
+            # isMatchTool,
+            # maxAreaTool,
+
+            # longestCommonPrefixTool,
+            # threeSumTool,
+            # isValidBracketsTool,
+            # generateParenthesisTool,
+            # groupAnagramsTool,
+            # lengthOfLastWordTool,
+            # addBinaryTool,
+            # minDistanceTool,
+            # largestNumberTool,
+            # reverseStringTool,
+            ]
     agent=create_react_agent(llm, tools,prompt)
     agent_executor = AgentExecutor(
         agent=agent,
